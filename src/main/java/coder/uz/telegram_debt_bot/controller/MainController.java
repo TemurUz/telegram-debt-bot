@@ -1,5 +1,9 @@
 package coder.uz.telegram_debt_bot.controller;
 
+import coder.uz.telegram_debt_bot.buttons.GetContactButtons;
+import coder.uz.telegram_debt_bot.buttons.MeatAndShopButton;
+import coder.uz.telegram_debt_bot.buttons.MeatShopButton;
+import coder.uz.telegram_debt_bot.buttons.ShopButton;
 import coder.uz.telegram_debt_bot.database.DatabaseCon;
 import coder.uz.telegram_debt_bot.model.User;
 import coder.uz.telegram_debt_bot.service.*;
@@ -9,13 +13,8 @@ import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import sun.util.calendar.BaseCalendar;
-import sun.util.calendar.LocalGregorianCalendar;
 
-import java.sql.Date;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.List;
 
 public class MainController extends TelegramLongPollingBot {
 
@@ -30,7 +29,7 @@ public class MainController extends TelegramLongPollingBot {
                 Long chatId = update.getMessage().getChatId();
                 switch (text) {
                     case "/start":
-                        SendMessage buttons = ButtonsService.contactButton(chatId);
+                        SendMessage buttons = GetContactButtons.contactButton(chatId);
                         try {
                             execute(buttons);
                         } catch (TelegramApiException e) {
@@ -52,7 +51,7 @@ public class MainController extends TelegramLongPollingBot {
                         break;
 
                     case "\uD83E\uDD69 Gusht dukon":
-                        sendMessage = MeatShopButtonService.treeButtons(chatId);
+                        sendMessage = MeatShopButton.treeButtons(chatId);
                         try {
                             execute(sendMessage);
                         } catch (TelegramApiException e) {
@@ -61,7 +60,7 @@ public class MainController extends TelegramLongPollingBot {
                         break;
 
                     case "\uD83C\uDFE2 Super market":
-                        sendMessage = ShopButtonService.shopsButtons(chatId);
+                        sendMessage = ShopButton.shopsButtons(chatId);
                         try {
                             execute(sendMessage);
                         } catch (TelegramApiException e) {
@@ -140,7 +139,7 @@ public class MainController extends TelegramLongPollingBot {
                 String phoneNumber = contact.getPhoneNumber();
                 if (phoneNumber.equals("+998999041697") || phoneNumber.equals("998932252777")){
                     System.out.println("phoneNumber"+phoneNumber+", chatId" + chatId);
-                    SendMessage sendMessage = MeatAndShopButtonService.twoButtons(chatId);
+                    SendMessage sendMessage = MeatAndShopButton.twoButtons(chatId);
                     try {
                         execute(sendMessage);
                     } catch (TelegramApiException e) {

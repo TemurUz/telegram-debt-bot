@@ -1,4 +1,4 @@
-package coder.uz.telegram_debt_bot.service;
+package coder.uz.telegram_debt_bot.buttons;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -8,11 +8,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShopButtonService {
-    public static SendMessage shopsButtons(Long chatId){
+public class MeatShopButton {
+
+    public static SendMessage treeButtons(Long chatId){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText("Super market dukoniga xush kelibsiz");
+        sendMessage.setText("Gusht dukoniga xush kelibsiz");
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -23,19 +24,19 @@ public class ShopButtonService {
         KeyboardRow keyboardRow1 = new KeyboardRow();
 
         KeyboardButton keyboardButton1 = new KeyboardButton();
-        keyboardButton1.setText("button1");
+        keyboardButton1.setText("User qushish ➕");
 
         keyboardRow1.add(keyboardButton1);
 
         KeyboardButton keyboardButton2 = new KeyboardButton();
-        keyboardButton2.setText("button2");
+        keyboardButton2.setText("Qarzlar ruyhati \uD83D\uDCD6");
 
         keyboardRow1.add(keyboardButton2);
 
         KeyboardRow keyboardRow2 = new KeyboardRow();
 
         KeyboardButton keyboardButton3 = new KeyboardButton();
-        keyboardButton3.setText("button3");
+        keyboardButton3.setText("Orqaga ⏮");
         keyboardRow2.add(keyboardButton3);
 
         keyboard.add(keyboardRow1);

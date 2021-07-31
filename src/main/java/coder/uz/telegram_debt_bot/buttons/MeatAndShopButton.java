@@ -1,4 +1,4 @@
-package coder.uz.telegram_debt_bot.service;
+package coder.uz.telegram_debt_bot.buttons;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -8,12 +8,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-public class MeatShopButtonService {
+public class MeatAndShopButton {
 
-    public static SendMessage treeButtons(Long chatId){
+
+    public static SendMessage twoButtons(Long chatId){
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText("Gusht dukoniga xush kelibsiz");
+        sendMessage.setText("Qarz dukonni tanlang");
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -21,26 +23,19 @@ public class MeatShopButtonService {
         replyKeyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
 
-        KeyboardRow keyboardRow1 = new KeyboardRow();
+        KeyboardRow keyboardRow = new KeyboardRow();
 
         KeyboardButton keyboardButton1 = new KeyboardButton();
-        keyboardButton1.setText("User qushish ➕");
+        keyboardButton1.setText("\uD83E\uDD69 Gusht dukon");
 
-        keyboardRow1.add(keyboardButton1);
+        keyboardRow.add(keyboardButton1);
 
         KeyboardButton keyboardButton2 = new KeyboardButton();
-        keyboardButton2.setText("Qarzlar ruyhati \uD83D\uDCD6");
+        keyboardButton2.setText("\uD83C\uDFE2 Super market");
 
-        keyboardRow1.add(keyboardButton2);
+        keyboardRow.add(keyboardButton2);
 
-        KeyboardRow keyboardRow2 = new KeyboardRow();
-
-        KeyboardButton keyboardButton3 = new KeyboardButton();
-        keyboardButton3.setText("Orqaga ⏮");
-        keyboardRow2.add(keyboardButton3);
-
-        keyboard.add(keyboardRow1);
-        keyboard.add(keyboardRow2);
+        keyboard.add(keyboardRow);
 
         replyKeyboardMarkup.setKeyboard(keyboard);
 
