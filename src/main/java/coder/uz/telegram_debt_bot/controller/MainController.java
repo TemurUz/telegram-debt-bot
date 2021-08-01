@@ -14,10 +14,13 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.sql.Date;
 import java.util.Calendar;
 
 public class MainController extends TelegramLongPollingBot {
 
+    public static String cmd = null;
+    public static User user = null;
 
     public void onUpdateReceived(Update update) {
 
@@ -25,10 +28,16 @@ public class MainController extends TelegramLongPollingBot {
             Message message = update.getMessage();
             if (message.hasText()){
                 SendMessage sendMessage;
-                String text = update.getMessage().getText();
+                String command;
+                if (cmd==null){
+                    command= message.getText();
+                }else {
+                    command = cmd;
+                }
                 Long chatId = update.getMessage().getChatId();
-                switch (text) {
+                switch (command) {
                     case "/start":
+                        cmd=null;
                         SendMessage buttons = GetContactButtons.contactButton(chatId);
                         try {
                             execute(buttons);
@@ -38,6 +47,7 @@ public class MainController extends TelegramLongPollingBot {
                         break;
 
                     case "/help":
+                        cmd=null;
                         SendMessage sendMessage1 = new SendMessage();
                         sendMessage1.setChatId(chatId);
                         sendMessage1.setText("Gusht dukon haqida malumot /Gusht dukon \n" +
@@ -51,6 +61,7 @@ public class MainController extends TelegramLongPollingBot {
                         break;
 
                     case "\uD83E\uDD69 Gusht dukon":
+                        cmd=null;
                         sendMessage = MeatShopButton.treeButtons(chatId);
                         try {
                             execute(sendMessage);
@@ -60,6 +71,7 @@ public class MainController extends TelegramLongPollingBot {
                         break;
 
                     case "\uD83C\uDFE2 Super market":
+                        cmd=null;
                         sendMessage = ShopButton.shopsButtons(chatId);
                         try {
                             execute(sendMessage);
@@ -67,44 +79,55 @@ public class MainController extends TelegramLongPollingBot {
                             e.printStackTrace();
                         }
                         break;
-                    case "User qushish ➕":
-                        DatabaseCon databaseCon = new DatabaseCon();
-                        sendMessage = new SendMessage();
-                        User user = new User();
-                        sendMessage.setChatId(chatId);
+                    case "User qushish ➕":{
 
-                        sendMessage.setText("Ism familiyasini kiriting.");
-                        try {
-                            execute(sendMessage);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
+                        cmd = "User qushish ➕";
+                        if (user==null){
+                            user = new User();
+                            sendMessage = new SendMessage();
+                            sendMessage.setChatId(chatId);
+                            sendMessage.setText("Ism: ");
+                            try {
+                                execute(sendMessage);
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
+                        }else if (user.getFullName()==null&& user.getPhoneNumber()==null&&user.getDebt()==null){
+                            user.setFullName(message.getText());
+                            sendMessage=new SendMessage().setChatId(chatId).setText("Phone: ");
+                            try {
+                                execute(sendMessage);
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
+                        }else if (user.getPhoneNumber()==null&&user.getDebt()==null){
+                            user.setPhoneNumber(message.getText());
+                            sendMessage=new SendMessage().setChatId(chatId).setText("Debt: ");
+                            try {
+                                execute(sendMessage);
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
+                        }else if (user.getDebt()==null){
+                            user.setDebt(Double.valueOf(message.getText()));
+                            user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
+                            sendMessage = new SendMessage();
+                            sendMessage.setText(user.toString());
+                            sendMessage.setChatId(chatId);
+                            try {
+                                execute(sendMessage);
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
+                        }else if (user!=null&&user.getFullName()!=null&&user.getDate()!=null&&user.getPhoneNumber()!=null&&user.getDebt()!=null){
+                            sendMessage = MeatShopButton.treeButtons(chatId);
+                            try {
+                                execute(sendMessage);
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        String text1 = message.getText();
-                        user.setFullName(update.getMessage().getText());
-
-
-                        sendMessage.setText("Telefon raqamini kiriting:");
-                        try {
-                            execute(sendMessage);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
-                        }
-                        user.setPhoneNumber(update.getMessage().getText());
-
-
-                        sendMessage.setText("Qarz miqdorini kiriting");
-                        try {
-                            execute(sendMessage);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
-                        }
-                        user.setDebt(Double.parseDouble(update.getMessage().getText()));
-
-                        user.setDate(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
-
-                        databaseCon.addUser(user, "meat");
-
-                        break;
+                    }break;
                     case "Orqaga ⏮":
 
                         break;
@@ -137,7 +160,7 @@ public class MainController extends TelegramLongPollingBot {
                 Contact contact = update.getMessage().getContact();
                 Long chatId = message.getChatId();
                 String phoneNumber = contact.getPhoneNumber();
-                if (phoneNumber.equals("+998999041697") || phoneNumber.equals("998932252777")){
+                if (phoneNumber.equals("+998999041697") || phoneNumber.equals("998932252777")||phoneNumber.equals("+998997214508")){
                     System.out.println("phoneNumber"+phoneNumber+", chatId" + chatId);
                     SendMessage sendMessage = MeatAndShopButton.twoButtons(chatId);
                     try {
