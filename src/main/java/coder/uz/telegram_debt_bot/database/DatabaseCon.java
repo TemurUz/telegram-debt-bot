@@ -32,8 +32,8 @@ public class DatabaseCon {
 
 
     public String addUser(User user, String tableName) {
-        String query = "INSERT INTO " + tableName + " (full_name, phone_number, date ,debt)" +
-                "VALUES (?,?,?,?);";
+        String query = "INSERT INTO " + tableName + "(\"fullName\", date , \"phoneNumber\",debt)" +
+                "VALUES (?,?,?,?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             List<User> userList = getUser(tableName);
@@ -41,11 +41,12 @@ public class DatabaseCon {
                 if (userList.get(i).getPhoneNumber().equals(user.getPhoneNumber())) {
                     return "bunaqa user oldin qo'shilgan";
                 } else {
+                    System.out.println(user);
                     preparedStatement.setString(1, user.getFullName());
-                    preparedStatement.setString(2, user.getPhoneNumber());
-                    preparedStatement.setDate(3, user.getDate());
+                    preparedStatement.setDate(2, user.getDate());
+                    preparedStatement.setString(3, user.getPhoneNumber());
                     preparedStatement.setDouble(4, user.getDebt());
-                    preparedStatement.executeUpdate();
+                    System.out.println(preparedStatement.executeUpdate());
                     return "user added";
                 }
             }

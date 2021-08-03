@@ -11,36 +11,22 @@ import java.util.List;
 public class MeatAndShopButton {
 
 
-    public static SendMessage twoButtons(Long chatId){
-
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText("Qarz dukonni tanlang");
-
+    public static ReplyKeyboardMarkup twoButtons(Long chatId){
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
-
         KeyboardRow keyboardRow = new KeyboardRow();
-
         KeyboardButton keyboardButton1 = new KeyboardButton();
         keyboardButton1.setText("\uD83E\uDD69 Gusht dukon");
-
         keyboardRow.add(keyboardButton1);
-
         KeyboardButton keyboardButton2 = new KeyboardButton();
         keyboardButton2.setText("\uD83C\uDFE2 Super market");
-
         keyboardRow.add(keyboardButton2);
-
         keyboard.add(keyboardRow);
-
         replyKeyboardMarkup.setKeyboard(keyboard);
-
-        sendMessage.setReplyMarkup(replyKeyboardMarkup);
-
-        return sendMessage;
+        return replyKeyboardMarkup;
     }
+
 }

@@ -12,11 +12,8 @@ import java.util.List;
 
 public class GetContactButtons {
 
-    public static SendMessage contactButton(Long chatId){
+    public static ReplyKeyboardMarkup contactButton(){
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText("Assalomu alaykum!!");
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 
@@ -28,16 +25,12 @@ public class GetContactButtons {
 
         KeyboardRow keyboardRow = new KeyboardRow();
         KeyboardButton keyboardButton = new KeyboardButton();
-        keyboardButton.setText("\uD83D\uDCDE Share your number ✅").setRequestContact(true);
+        keyboardButton.setText("\uD83D\uDCDE Share your number ✅");
+        keyboardButton.setRequestContact(true);
         keyboardRow.add(keyboardButton);
-
         keyboard.add(keyboardRow);
-
         replyKeyboardMarkup.setKeyboard(keyboard);
-        sendMessage.setReplyMarkup(replyKeyboardMarkup);
-
-
-        return sendMessage;
+        return replyKeyboardMarkup;
     }
 
 }

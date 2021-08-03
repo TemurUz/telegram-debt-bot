@@ -10,10 +10,7 @@ import java.util.List;
 
 public class MeatShopButton {
 
-    public static SendMessage treeButtons(Long chatId){
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText("Gusht dukoniga xush kelibsiz");
+    public static ReplyKeyboardMarkup treeButtons(){
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -43,9 +40,7 @@ public class MeatShopButton {
         keyboard.add(keyboardRow2);
 
         replyKeyboardMarkup.setKeyboard(keyboard);
-
-        sendMessage.setReplyMarkup(replyKeyboardMarkup);
-
-        return sendMessage;
+        return replyKeyboardMarkup;
     }
+
 }
