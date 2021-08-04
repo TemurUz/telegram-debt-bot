@@ -20,76 +20,36 @@ public class MainService {
 
     public String getUserList(String tableName){
         List<User> list = databaseCon.getUser(tableName);
+        int count = 1;
         String result = "";
         for (User user : list) {
-            result += user.getId() + ")\uD83D\uDC64 " + user.getFullName() + "\n" +
+            result += count + ")\uD83D\uDC64 " + user.getFullName() + "\n" +
                     "   \uD83D\uDCF1 " + user.getPhoneNumber() + "\n   \uD83D\uDCB0 " + user.getDebt() + " SO'M\n" +
-                    "   \uD83D\uDCC5 "+user.getDate()+ "\n  ---------------------\n";
+                    "   \uD83D\uDCC5 "+user.getDate()+ "\n" +
+                    "/todo_edit"+user.getId()+
+                    "  ---------------------\n";
+            count++;
         }
         return result;
     }
 
  MainController mainController = new MainController();
 
-//    public void addUser(User user, Long chatId, Message message, Update update) {
-//        SendMessage sendMessage;
+//    public String addUser(User user, Message message) {
+//        String receivedMessage = "";
+//        user.getFullName();
+////        user.getPhoneNumber();
+//        user.getDebt();
 //
-//        if (user == null) {
-//            user = new User();
-//            sendMessage = new SendMessage();
-//            sendMessage.setChatId(chatId);
-//            sendMessage.setText("Ism: ");
-//            mainController.executeMethod(sendMessage);
-////            try {
-////                execute(sendMessage);
-////            } catch (TelegramApiException e) {
-////                e.printStackTrace();
-////            }
-//        } else if (user.getFullName() == null && user.getPhoneNumber() == null && user.getDebt() == null) {
+//        if (user == null && message.getText().equals("User qushish ➕")){
+//            receivedMessage = "Ismini kiriting";
+//            return receivedMessage;
+//        }else if (user.getFullName()==null&& user.getPhoneNumber()==null&&user.getDebt()==null) {
 //            user.setFullName(message.getText());
-//            sendMessage = new SendMessage().setChatId(chatId).setText("Phone: ");
-//            mainController.executeMethod(sendMessage);
-////            try {
-////                execute(sendMessage);
-////            } catch (TelegramApiException e) {
-////                e.printStackTrace();
-////            }
-//        } else if (user.getPhoneNumber() == null && user.getDebt() == null) {
-//            user.setPhoneNumber(message.getText());
-//            sendMessage = new SendMessage().setChatId(chatId).setText("Debt: ");
-//            mainController.executeMethod(sendMessage);
-//
-////            try {
-////                execute(sendMessage);
-////            } catch (TelegramApiException e) {
-////                e.printStackTrace();
-////            }
-//        } else if (user.getDebt() == null) {
-//            user.setDebt(Double.valueOf(message.getText()));
-//            user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
-//            sendMessage = new SendMessage();
-//            sendMessage.setText(user.toString());
-//            sendMessage.setChatId(chatId);
-//            mainController.executeMethod(sendMessage);
-////            try {
-////                execute(sendMessage);
-////            } catch (TelegramApiException e) {
-////                e.printStackTrace();
-////            }
-//            DatabaseCon databaseCon = new DatabaseCon();
-//            databaseCon.addUser(user, "meat");
-//            System.out.println(user);
-//        } else if (user != null && user.getFullName() != null && user.getDate() != null && user.getPhoneNumber() != null && user.getDebt() != null) {
-//
-//            user = null;
-//            sendMessage = MeatShopButton.treeButtons(chatId);
-//            mainController.executeMethod(sendMessage);
-////            try {
-////                execute(sendMessage);
-////            } catch (TelegramApiException e) {
-////                e.printStackTrace();
-////            }
+//            receivedMessage = "Phone numberini kiriting";
+//            return receivedMessage;
 //        }
+//        return "";
 //    }
 
 

@@ -1,13 +1,15 @@
 package coder.uz.telegram_debt_bot.database;
 
 import coder.uz.telegram_debt_bot.model.User;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Setter
+@Getter
 public class DatabaseCon {
 
     private String url = "jdbc:postgresql://localhost:5432/debt_db";
@@ -15,48 +17,68 @@ public class DatabaseCon {
     private String password = "9704";
     Connection connection = null;
 
-    public Connection getConnection() {
+    private Connection getConnection() {
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(url, userName, password);
 
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
         return connection;
     }
 
 
-
-
-    public String addUser(User user, String tableName) {
+    public boolean addUser(User user, String tableName) throws SQLException {
         String query = "INSERT INTO " + tableName + "(\"fullName\", date , \"phoneNumber\",debt)" +
                 "VALUES (?,?,?,?)";
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+             preparedStatement = connection.prepareStatement(query);
             List<User> userList = getUser(tableName);
-            for (int i = 0; i < userList.size(); i++) {
-                if (userList.get(i).getPhoneNumber().equals(user.getPhoneNumber())) {
-                    return "bunaqa user oldin qo'shilgan";
-                } else {
-                    System.out.println(user);
-                    preparedStatement.setString(1, user.getFullName());
-                    preparedStatement.setDate(2, user.getDate());
-                    preparedStatement.setString(3, user.getPhoneNumber());
-                    preparedStatement.setDouble(4, user.getDebt());
-                    System.out.println(preparedStatement.executeUpdate());
-                    return "user added";
+//            for (int i = 0; i < userList.size(); i++) {
+//                if (userList.get(i).getPhoneNumber().equals(user.getPhoneNumber())) {
+//                    return "bunaqa user oldin qo'shilgan";
+//                } else {
+//                    System.out.println(user);
+//                    preparedStatement.setString(1, user.getFullName());
+//                    preparedStatement.setDate(2, user.getDate());
+//                    preparedStatement.setString(3, user.getPhoneNumber());
+//                    preparedStatement.setDouble(4, user.getDebt());
+//                    System.out.println(preparedStatement.executeUpdate());
+//                    return "user added";
+//                }
+//            }
+
+            boolean success = false;
+            for (User value : userList) {
+                if (user.getPhoneNumber().equals(value.getPhoneNumber())) {
+                    success = true;
+                    break;
                 }
             }
-            preparedStatement.close();
-            connection.close();
+            if (!success){
+                preparedStatement.setString(1, user.getFullName());
+                preparedStatement.setDate(2, user.getDate());
+                preparedStatement.setString(3, user.getPhoneNumber());
+                preparedStatement.setDouble(4, user.getDebt());
+                System.out.println(preparedStatement.executeUpdate());
+                user=null;
+                return true;
+            }else {
+                return false;
+            }
+
+
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }finally {
+            assert preparedStatement != null;
+            preparedStatement.close();
+            connection.close();
         }
-        return "user didn't add";
+        return false;
 
     }
 
@@ -97,7 +119,7 @@ public class DatabaseCon {
                 if (users.get(i).getId().equals(id)) {
                     preparedStatement.setInt(1, id);
                     int i1 = preparedStatement.executeUpdate();
-                    if (i1>0) {
+                    if (i1 > 0) {
                         return "user was deleted successfully!";
                     }
                 }
@@ -115,7 +137,7 @@ public class DatabaseCon {
     public String editUser(Long id, Double debt, String tableName) {
         List<User> userList = getUser(tableName);
         String query = "Update " + tableName + "" +
-                "SET debt=?"+
+                "SET debt=?" +
                 "Where id=" + id + "";
 
         try {

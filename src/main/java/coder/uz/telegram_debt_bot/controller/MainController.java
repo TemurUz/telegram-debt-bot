@@ -1,19 +1,17 @@
 package coder.uz.telegram_debt_bot.controller;
 
-import coder.uz.telegram_debt_bot.buttons.GetContactButtons;
-import coder.uz.telegram_debt_bot.buttons.MeatAndShopButton;
-import coder.uz.telegram_debt_bot.buttons.MeatShopButton;
-import coder.uz.telegram_debt_bot.buttons.ShopButton;
+import coder.uz.telegram_debt_bot.buttons.*;
 import coder.uz.telegram_debt_bot.database.DatabaseCon;
 import coder.uz.telegram_debt_bot.model.User;
 import coder.uz.telegram_debt_bot.service.*;
+import lombok.SneakyThrows;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.sql.Date;
+import java.sql.*;
 import java.util.Calendar;
 
 public class MainController extends TelegramLongPollingBot {
@@ -28,9 +26,10 @@ public class MainController extends TelegramLongPollingBot {
     }
 
     public static String cmd = null;
-    public static User user = null;
-    public int step = 0;
+    private User user = null;
+    private int step = 0;
 
+    @SneakyThrows
     public void onUpdateReceived(Update update) {
 //        if (update.hasMessage()) {
 //            Message message = update.getMessage();
@@ -198,10 +197,11 @@ public class MainController extends TelegramLongPollingBot {
         Message message = update.getMessage();
         String receivedMessage = update.getMessage().getText();
         Long chatId = update.getMessage().getChatId();
-        String sendingMessage = "";
+        String sendingMessage = "111";
 
         if (update.hasMessage()) {
             if (message.hasText()) {
+
                 if (receivedMessage.equals("/start")) {
                     step = 1;
                 }
@@ -209,7 +209,15 @@ public class MainController extends TelegramLongPollingBot {
                     step = 2;
                 }
                 if (receivedMessage.equals("Orqaga ⏮")) {
-                    step -= 1;
+                    step = 3;
+                }
+                if (receivedMessage.equals("User qushish ➕")){
+                    step = 4;
+                }
+                if (receivedMessage.equals("Qarzlar ruyhati \uD83D\uDCD6")){
+                    step = 5;
+                }if (receivedMessage.startsWith("/todo_edit")){
+                    step = 6;
                 }
 
                 switch (step) {
@@ -219,14 +227,63 @@ public class MainController extends TelegramLongPollingBot {
                         sendMessage.setReplyMarkup(replyKeyboardMarkup);
                         break;
                     case 2:
-
-                        break;
-                    case 3:
                         sendingMessage = "Gusht dukonchasiga hush kelibsiz";
                         sendMessage.setReplyMarkup(MeatShopButton.treeButtons());
                         break;
+                    case 3:
+                        MeatAndShopButton.twoButtons(chatId);
+                        sendingMessage = "Marketlardan birini tanlang";
+                        sendMessage.setReplyMarkup(MeatAndShopButton.twoButtons(chatId));
+                        break;
                     case 4:
+                        if (user==null){
+                            user = new User();
+                            sendingMessage = "Ismini kiriting";
+                        }else if (user.getFullName()==null&& user.getPhoneNumber()==null&&user.getDebt()==null){
+                            if (receivedMessage.equals("Orqaga ⏮")){
+                                user = null;
+                            }else {
+                                user.setFullName(message.getText());
+                            }
 
+                            sendingMessage = "Phone: ";
+                        }else if (user.getPhoneNumber()==null&&user.getDebt()==null){
+                            user.setPhoneNumber(message.getText());
+                            sendingMessage = "Debt: ";
+                        }else if (user.getDebt()==null){
+                            Double debt = Double.parseDouble(message.getText()+".0");
+
+                            user.setDebt(debt);
+                            user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
+                            System.out.println(user);
+                            Connection connection = null;
+                            Class.forName("org.postgresql.Driver");
+                            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/debt_db",
+                                    "postgres", "9704");
+                            String query = "INSERT INTO " + " meat " + "(\"fullName\", date , \"phoneNumber\",debt)" +
+                                    "VALUES (?,?,?,?)";
+                            PreparedStatement preparedStatement = null;
+                            preparedStatement = connection.prepareStatement(query);
+                            preparedStatement.setString(1, user.getFullName());
+                            preparedStatement.setDate(2, user.getDate());
+                            preparedStatement.setString(3, user.getPhoneNumber());
+                            preparedStatement.setDouble(4, user.getDebt());
+                            preparedStatement.execute();
+                            user=null;
+                            sendingMessage = "Data successfully saved!";
+
+                        }
+                        break;
+                    case 5:
+                        MainService mainService = new MainService();
+                        sendingMessage = mainService.getUserList("meat");
+                        break;
+                    case 6:
+                        sendMessage.setReplyMarkup(UpdateAndDeleteButton.inlineButton());
+                        sendingMessage = "update list";
+                        break;
+                    default:
+                        sendingMessage="Notug'ri malumot";
                         break;
                 }
 //                step++;
