@@ -107,31 +107,23 @@ public class DatabaseCon {
         return users;
     }
 
-    public String deleteUser(Integer id, String tableName) {
-
-        List<User> users = new ArrayList<>();
-        String query = "DELETE FROM " + tableName + " WHERE username=?";
+    public String deleteUser(int id, String tableName) {
+        String s;
+        String query = "DELETE FROM " + tableName + " WHERE id=?";
 
         try {
             PreparedStatement preparedStatement = getConnection().prepareStatement(query);
-            List<User> userList = getUser(tableName);
-            for (int i = 0; i < userList.size(); i++) {
-                if (users.get(i).getId().equals(id)) {
-                    preparedStatement.setInt(1, id);
-                    int i1 = preparedStatement.executeUpdate();
-                    if (i1 > 0) {
-                        return "user was deleted successfully!";
-                    }
-                }
-
-            }
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
             preparedStatement.close();
             getConnection().close();
+            s = "delete user";
 
         } catch (SQLException e) {
+            s = "user id not found";
             e.printStackTrace();
         }
-        return "user id not found";
+        return s;
     }
 
     public String editUser(Long id, Double debt, String tableName) {

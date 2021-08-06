@@ -16,6 +16,24 @@ import java.util.Calendar;
 
 public class MainController extends TelegramLongPollingBot {
 
+    private String url = "jdbc:postgresql://localhost:5432/debt_db";
+    private String userName = "postgres";
+    private String password = "9704";
+    Connection connection = null;
+
+    public Connection getConnection() {
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection(url, userName, password);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return connection;
+    }
+
     public String getBotToken() {
         return "1909460875:AAGZrr33BLapmGW9PmJtiYLcA1R7eWVygqw";
     }
@@ -28,170 +46,11 @@ public class MainController extends TelegramLongPollingBot {
     public static String cmd = null;
     private User user = null;
     private int step = 0;
+    private MainService mainService;
+    private DatabaseCon databaseCon;
 
-    @SneakyThrows
+     @SneakyThrows
     public void onUpdateReceived(Update update) {
-//        if (update.hasMessage()) {
-//            Message message = update.getMessage();
-//            if (message.hasText()){
-//                SendMessage sendMessage;
-//                String command;
-//                if (cmd==null){
-//                    command= message.getText();
-//                }else {
-//                    command = cmd;
-//                }
-//                command = command.toLowerCase();
-////                if (command.contains("/start")){
-////                    step = 1;
-////                }
-//
-//                if (command.contains("\uD83E\uDD69 Gusht dukon")){
-//
-//                }
-//
-//                Long chatId = update.getMessage().getChatId();
-//                switch (command) {
-//                    case "/start":
-//                        cmd=null;
-//                        SendMessage buttons = GetContactButtons.contactButton(chatId);
-//                        try {
-//                            execute(buttons);
-//                        } catch (TelegramApiException e) {
-//                            e.printStackTrace();
-//                        }
-//                        break;
-//
-//                    case "\uD83E\uDD69 Gusht dukon":
-//                        cmd=null;
-//                        sendMessage = MeatShopButton.treeButtons(chatId);
-//                        try {
-//                            execute(sendMessage);
-//                        } catch (TelegramApiException e) {
-//                            e.printStackTrace();
-//                        }
-//                        break;
-//
-//                    case "\uD83C\uDFE2 Super market":
-//                        cmd=null;
-//                        sendMessage = ShopButton.shopsButtons(chatId);
-//                        try {
-//                            execute(sendMessage);
-//                        } catch (TelegramApiException e) {
-//                            e.printStackTrace();
-//                        }
-//                        break;
-//                    case "User qushish ➕":{
-//
-//                        cmd = "User qushish ➕";
-//
-//                        if (user==null){
-//                            user = new User();
-//                            sendMessage = new SendMessage();
-//                            sendMessage.setChatId(chatId);
-//                            sendMessage.setText("Ism: ");
-//                            try {
-//                                execute(sendMessage);
-//                            } catch (TelegramApiException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }else if (user.getFullName()==null&& user.getPhoneNumber()==null&&user.getDebt()==null){
-//                            user.setFullName(message.getText());
-//                            sendMessage=new SendMessage().setChatId(chatId).setText("Phone: ");
-//                            try {
-//                                execute(sendMessage);
-//                            } catch (TelegramApiException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }else if (user.getPhoneNumber()==null&&user.getDebt()==null){
-//                            user.setPhoneNumber(message.getText());
-//                            sendMessage=new SendMessage().setChatId(chatId).setText("Debt: ");
-//                            try {
-//                                execute(sendMessage);
-//                            } catch (TelegramApiException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }else if (user.getDebt()==null){
-//                            user.setDebt(Double.valueOf(message.getText()));
-//                            user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
-//
-//                            sendMessage = new SendMessage();
-////                            sendMessage.setText(user.toString());
-//                            DatabaseCon databaseCon = new DatabaseCon();
-//                            databaseCon.addUser(user, "meat");
-////                            sendMessage = MeatShopButton.treeButtons(chatId);
-//                            sendMessage.setText(message.getContact().getPhoneNumber());
-//                            sendMessage.setChatId(chatId);
-//                            try {
-//                                execute(sendMessage);
-//                            } catch (TelegramApiException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            cmd=null;
-//                            user = null;
-//                            System.out.println(user);
-//                        }
-//
-////                        else if (user!=null&&user.getFullName()!=null&&user.getDate()!=null&&user.getPhoneNumber()!=null&&user.getDebt()!=null){
-////                            sendMessage = MeatShopButton.treeButtons(chatId);
-////                            user=null;
-////                            cmd  = null;
-////                            try {
-////                                execute(sendMessage);
-////                            } catch (TelegramApiException e) {
-////                                e.printStackTrace();
-////                            }
-////                        }
-////
-//
-//                    }break;
-//
-//                    case "Orqaga ⏮":
-//                        sendMessage = MeatAndShopButton.twoButtons(chatId);
-//                        executeMethod(sendMessage);
-//                        break;
-//                    case "Qarzlar ruyhati \uD83D\uDCD6":
-//                        MainService mainService = new MainService();
-//                        sendMessage = new SendMessage();
-//                        sendMessage.setChatId(chatId);
-//                        String meat = mainService.getUserList("meat");
-//                        sendMessage.setText(meat);
-//
-//                        try {
-//                            execute(sendMessage);
-//                        } catch (TelegramApiException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        break;
-//                    default:
-//                        sendMessage = new SendMessage();
-//                        sendMessage.setChatId(chatId);
-//                        sendMessage.setText("Notug'ri malumot kiritingiz /help");
-//                        try {
-//                            execute(sendMessage);
-//                        } catch (TelegramApiException e) {
-//                            e.printStackTrace();
-//                        }
-//                        break;
-//                }
-//            }else if (message.hasContact()){
-//                Contact contact = update.getMessage().getContact();
-//                Long chatId = message.getChatId();
-//                String phoneNumber = contact.getPhoneNumber();
-//                if (phoneNumber.equals("+998999041697") || phoneNumber.equals("+998932252777")||phoneNumber.equals("+998997214508") || phoneNumber.equals("998939046601")){
-//                    System.out.println("phoneNumber"+phoneNumber+", chatId" + chatId);
-//                    SendMessage sendMessage = MeatAndShopButton.twoButtons(chatId);
-//                    try {
-//                        execute(sendMessage);
-//                    } catch (TelegramApiException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }
-
 
         SendMessage sendMessage = new SendMessage();
         Message message = update.getMessage();
@@ -204,23 +63,26 @@ public class MainController extends TelegramLongPollingBot {
 
                 if (receivedMessage.equals("/start")) {
                     step = 1;
-                }
-                if (receivedMessage.equals("\uD83E\uDD69 Gusht dukon")) {
+                }else if (receivedMessage.equals("\uD83E\uDD69 Gusht dukon")) {
                     step = 2;
-                }
-                if (receivedMessage.equals("Orqaga ⏮")) {
+                }else if (receivedMessage.equals("Orqaga ⏮")){
                     step = 3;
-                }
-                if (receivedMessage.equals("User qushish ➕")){
+                }else if (receivedMessage.equals("User qushish ➕")){
                     step = 4;
-                }
-                if (receivedMessage.equals("Qarzlar ruyhati \uD83D\uDCD6")){
+                }else if (receivedMessage.equals("Qarzlar ruyhati \uD83D\uDCD6")){
                     step = 5;
-                }if (receivedMessage.startsWith("/todo_edit")){
+                }else if (receivedMessage.startsWith("/todo_edit")){
                     step = 6;
+                    cmd = receivedMessage;
+                }else if (receivedMessage.equals("Orqaga \uD83D\uDD19")){
+                    step = 2;
+                }else if (receivedMessage.equals("Delete \uD83D\uDDD1")){
+                    step = 7;
+                }else if (receivedMessage.equals("Update \uD83D\uDD04")){
+                    step = 12;
                 }
 
-                switch (step) {
+                switch (step){
                     case 1:
                         sendingMessage = "Assalomu alaykum Botga hush kelibsiz";
                         ReplyKeyboardMarkup replyKeyboardMarkup = GetContactButtons.contactButton();
@@ -236,6 +98,7 @@ public class MainController extends TelegramLongPollingBot {
                         sendMessage.setReplyMarkup(MeatAndShopButton.twoButtons(chatId));
                         break;
                     case 4:
+                        // add user
                         if (user==null){
                             user = new User();
                             sendingMessage = "Ismini kiriting";
@@ -255,15 +118,10 @@ public class MainController extends TelegramLongPollingBot {
 
                             user.setDebt(debt);
                             user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
-                            System.out.println(user);
-                            Connection connection = null;
-                            Class.forName("org.postgresql.Driver");
-                            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/debt_db",
-                                    "postgres", "9704");
                             String query = "INSERT INTO " + " meat " + "(\"fullName\", date , \"phoneNumber\",debt)" +
                                     "VALUES (?,?,?,?)";
                             PreparedStatement preparedStatement = null;
-                            preparedStatement = connection.prepareStatement(query);
+                            preparedStatement = getConnection().prepareStatement(query);
                             preparedStatement.setString(1, user.getFullName());
                             preparedStatement.setDate(2, user.getDate());
                             preparedStatement.setString(3, user.getPhoneNumber());
@@ -275,13 +133,80 @@ public class MainController extends TelegramLongPollingBot {
                         }
                         break;
                     case 5:
-                        MainService mainService = new MainService();
+                        //debt list
+                        mainService = new MainService();
                         sendingMessage = mainService.getUserList("meat");
                         break;
                     case 6:
-                        sendMessage.setReplyMarkup(UpdateAndDeleteButton.inlineButton());
-                        sendingMessage = "update list";
+                        //todo_edit function
+                        sendMessage.setReplyMarkup(UpdateAndDeleteButton.userUpdateAndDeleteButton());
+                        mainService = new MainService();
+                        String meat = mainService.getUser(receivedMessage, "meat");
+                        sendingMessage = meat;
                         break;
+                    case 7:
+                        //Delete meat shops
+                        mainService = new MainService();
+//                        databaseCon = new DatabaseCon();
+                        int id = Integer.parseInt(mainService.userId(cmd, "meat"));
+                        String queryDelete = "DELETE FROM  meat WHERE id=?";
+                        PreparedStatement preparedStatement = null;
+                        try {
+                            preparedStatement = getConnection().prepareStatement(queryDelete);
+                            preparedStatement.setInt(1, id);
+                            preparedStatement.execute();
+                            sendingMessage = "muvofiqiyatli o'chirildi user";
+
+                        } catch (SQLException throwables) {
+                            sendingMessage = "bunaqa user id mavjud emas";
+                            throwables.printStackTrace();
+                        }
+                        step = 6;
+                        break;
+                    case 12:
+                        mainService = new MainService();
+                        String userId = mainService.userId(cmd, "meat");
+                        Long usId = Long.parseLong(userId);
+                        if (receivedMessage.equals("Update \uD83D\uDD04")) {
+                            user = new User();
+                            receivedMessage = null;
+                        }
+                        if ((user.getId() == null) && receivedMessage==null){
+                            if (userId==null){
+                                sendingMessage = "Bunaqa user yuq";
+                            }else {
+                                user.setId(usId);
+                                sendingMessage = "full nameni kirit";
+                                System.out.println(user);
+                                receivedMessage = null;
+                            }
+                        }else if (user.getFullName() == null&&user.getPhoneNumber()==null && user.getDebt()==null) {
+                            user.setFullName(receivedMessage);
+                            sendingMessage = "phone number kiriting:";
+                            receivedMessage = null;
+                        } else if (user.getPhoneNumber() == null && user.getDebt() == null) {
+                            user.setPhoneNumber(receivedMessage);
+                            sendingMessage = "qarzini kiriting";
+                        }else if (user.getDebt()==null){
+                            user.setDebt(Double.parseDouble(receivedMessage));
+                            user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
+                            String query = "Update meat set meat.fullName= ? , date=?, meat.phoneNumber=?, debt=? where  id=" + user.getId() + " ;";
+                            try {
+                                PreparedStatement preparedStatement1 = getConnection().prepareStatement(query);
+                                preparedStatement1.setString(1, user.getFullName());
+                                preparedStatement1.setDate(2, user.getDate());
+                                preparedStatement1.setString(3,user.getPhoneNumber());
+                                preparedStatement1.setDouble(4,user.getDebt());
+                                System.out.println(user);
+                                preparedStatement1.execute();
+                                sendingMessage = "muvofiqiatli o'zgartirildi ";
+                                user = null;
+                                receivedMessage = null;
+                            } catch (SQLException throwables) {
+                                throwables.printStackTrace();
+                            }
+                        }
+                            break;
                     default:
                         sendingMessage="Notug'ri malumot";
                         break;
@@ -293,7 +218,9 @@ public class MainController extends TelegramLongPollingBot {
                 if (phoneNumber.equals("+998999041697")
                         || phoneNumber.equals("+998932252777")
                         || phoneNumber.equals("+998997214508")
-                        || phoneNumber.equals("998939046601")) {
+                        || phoneNumber.equals("998939046601")
+                        || phoneNumber.equals("905527410197")
+                ) {
                     System.out.println("phoneNumber" + phoneNumber + ", chatId" + chatId);
                     ReplyKeyboardMarkup replyKeyboardMarkup = MeatAndShopButton.twoButtons(chatId);
                     sendingMessage = "Marketlardan birini tanlang";
@@ -302,7 +229,7 @@ public class MainController extends TelegramLongPollingBot {
             }
 
 
-            sendMessage.setText(sendingMessage);
+                sendMessage.setText(sendingMessage);
             sendMessage.setChatId(chatId.toString());
             try {
                 execute(sendMessage);

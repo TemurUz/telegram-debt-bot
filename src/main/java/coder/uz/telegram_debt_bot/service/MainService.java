@@ -1,25 +1,18 @@
 package coder.uz.telegram_debt_bot.service;
 
-import coder.uz.telegram_debt_bot.buttons.MeatShopButton;
 import coder.uz.telegram_debt_bot.controller.MainController;
 import coder.uz.telegram_debt_bot.database.DatabaseCon;
 import coder.uz.telegram_debt_bot.model.User;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.List;
-
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class MainService {
     DatabaseCon databaseCon = new DatabaseCon();
-
+    List<User> list;
     public String getUserList(String tableName){
-        List<User> list = databaseCon.getUser(tableName);
+        list = databaseCon.getUser(tableName);
         int count = 1;
         String result = "";
         for (User user : list) {
@@ -33,7 +26,32 @@ public class MainService {
         return result;
     }
 
- MainController mainController = new MainController();
+    public String getUser(String text, String tableName){
+        String d = "Bunday user mavjud emas";
+        int count = 1;
+        List<User> userList = databaseCon.getUser(tableName);
+        for (User user : userList) {
+            if (user.getId().toString().equals(text.substring(10))) {
+                d = count + ")\uD83D\uDC64 " + user.getFullName() + "\n" +
+                        "   \uD83D\uDCF1 " + user.getPhoneNumber() + "\n   \uD83D\uDCB0 " + user.getDebt() + " SO'M\n" +
+                        "   \uD83D\uDCC5 "+user.getDate()+ "\n" ;
+
+            }
+            count++;
+        }
+        return d;
+    }
+
+    public String userId(String text, String tableName){
+        String res = null;
+       List<User> userList1 = databaseCon.getUser(tableName);
+        for (User user : userList1) {
+            if (user.getId().toString().equals(text.substring(10))){
+                res = text.substring(10);
+            }
+        }
+        return res;
+    }
 
 //    public String addUser(User user, Message message) {
 //        String receivedMessage = "";
