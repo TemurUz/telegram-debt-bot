@@ -16,14 +16,13 @@ import java.util.Calendar;
 
 public class MainController extends TelegramLongPollingBot {
 
-    private String url = "jdbc:postgresql://localhost:5432/debt_db";
-    private String userName = "postgres";
-    private String password = "9704";
-    Connection connection = null;
-
     public Connection getConnection() {
+        Connection connection = null;
         try {
             Class.forName("org.postgresql.Driver");
+            String url = "jdbc:postgresql://localhost:5432/debt_db";
+            String userName = "postgres";
+            String password = "9704";
             connection = DriverManager.getConnection(url, userName, password);
 
         } catch (SQLException throwables) {
@@ -35,7 +34,7 @@ public class MainController extends TelegramLongPollingBot {
     }
 
     public String getBotToken() {
-        return "1909460875:AAGZrr33BLapmGW9PmJtiYLcA1R7eWVygqw";
+        return "token";
     }
 
 
@@ -46,10 +45,9 @@ public class MainController extends TelegramLongPollingBot {
     public static String cmd = null;
     private User user = null;
     private int step = 0;
-    private MainService mainService;
     private DatabaseCon databaseCon;
 
-     @SneakyThrows
+    @SneakyThrows
     public void onUpdateReceived(Update update) {
 
         SendMessage sendMessage = new SendMessage();
@@ -63,26 +61,26 @@ public class MainController extends TelegramLongPollingBot {
 
                 if (receivedMessage.equals("/start")) {
                     step = 1;
-                }else if (receivedMessage.equals("\uD83E\uDD69 Gusht dukon")) {
+                } else if (receivedMessage.equals("\uD83E\uDD69 Gusht dukon")) {
                     step = 2;
-                }else if (receivedMessage.equals("Orqaga ⏮")){
+                } else if (receivedMessage.equals("Orqaga ⏮")) {
                     step = 3;
-                }else if (receivedMessage.equals("User qushish ➕")){
+                } else if (receivedMessage.equals("User qushish ➕")) {
                     step = 4;
-                }else if (receivedMessage.equals("Qarzlar ruyhati \uD83D\uDCD6")){
+                } else if (receivedMessage.equals("Qarzlar ruyhati \uD83D\uDCD6")) {
                     step = 5;
-                }else if (receivedMessage.startsWith("/todo_edit")){
+                } else if (receivedMessage.startsWith("/todo_edit")) {
                     step = 6;
                     cmd = receivedMessage;
-                }else if (receivedMessage.equals("Orqaga \uD83D\uDD19")){
+                } else if (receivedMessage.equals("Orqaga \uD83D\uDD19")) {
                     step = 2;
-                }else if (receivedMessage.equals("Delete \uD83D\uDDD1")){
+                } else if (receivedMessage.equals("Delete \uD83D\uDDD1")) {
                     step = 7;
-                }else if (receivedMessage.equals("Update \uD83D\uDD04")){
+                } else if (receivedMessage.equals("Update \uD83D\uDD04")) {
                     step = 12;
                 }
 
-                switch (step){
+                switch (step) {
                     case 1:
                         sendingMessage = "Assalomu alaykum Botga hush kelibsiz";
                         ReplyKeyboardMarkup replyKeyboardMarkup = GetContactButtons.contactButton();
@@ -99,22 +97,18 @@ public class MainController extends TelegramLongPollingBot {
                         break;
                     case 4:
                         // add user
-                        if (user==null){
+                        if (user == null) {
                             user = new User();
                             sendingMessage = "Ismini kiriting";
-                        }else if (user.getFullName()==null&& user.getPhoneNumber()==null&&user.getDebt()==null){
-                            if (receivedMessage.equals("Orqaga ⏮")){
-                                user = null;
-                            }else {
-                                user.setFullName(message.getText());
-                            }
+                        } else if (user.getFullName() == null && user.getPhoneNumber() == null && user.getDebt() == null) {
+                            user.setFullName(message.getText());
 
                             sendingMessage = "Phone: ";
-                        }else if (user.getPhoneNumber()==null&&user.getDebt()==null){
+                        } else if (user.getPhoneNumber() == null && user.getDebt() == null) {
                             user.setPhoneNumber(message.getText());
                             sendingMessage = "Debt: ";
-                        }else if (user.getDebt()==null){
-                            Double debt = Double.parseDouble(message.getText()+".0");
+                        } else if (user.getDebt() == null) {
+                            Double debt = Double.parseDouble(message.getText() + ".0");
 
                             user.setDebt(debt);
                             user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
@@ -127,22 +121,21 @@ public class MainController extends TelegramLongPollingBot {
                             preparedStatement.setString(3, user.getPhoneNumber());
                             preparedStatement.setDouble(4, user.getDebt());
                             preparedStatement.execute();
-                            user=null;
+                            user = null;
                             sendingMessage = "Data successfully saved!";
 
                         }
                         break;
                     case 5:
                         //debt list
-                        mainService = new MainService();
+                        MainService mainService = new MainService();
                         sendingMessage = mainService.getUserList("meat");
                         break;
                     case 6:
                         //todo_edit function
                         sendMessage.setReplyMarkup(UpdateAndDeleteButton.userUpdateAndDeleteButton());
                         mainService = new MainService();
-                        String meat = mainService.getUser(receivedMessage, "meat");
-                        sendingMessage = meat;
+                        sendingMessage = mainService.getUser(receivedMessage, "meat");
                         break;
                     case 7:
                         //Delete meat shops
@@ -150,7 +143,7 @@ public class MainController extends TelegramLongPollingBot {
 //                        databaseCon = new DatabaseCon();
                         int id = Integer.parseInt(mainService.userId(cmd, "meat"));
                         String queryDelete = "DELETE FROM  meat WHERE id=?";
-                        PreparedStatement preparedStatement = null;
+                        PreparedStatement preparedStatement;
                         try {
                             preparedStatement = getConnection().prepareStatement(queryDelete);
                             preparedStatement.setInt(1, id);
@@ -171,23 +164,19 @@ public class MainController extends TelegramLongPollingBot {
                             user = new User();
                             receivedMessage = null;
                         }
-                        if ((user.getId() == null) && receivedMessage==null){
-                            if (userId==null){
-                                sendingMessage = "Bunaqa user yuq";
-                            }else {
-                                user.setId(usId);
-                                sendingMessage = "full nameni kirit";
-                                System.out.println(user);
-                                receivedMessage = null;
-                            }
-                        }else if (user.getFullName() == null&&user.getPhoneNumber()==null && user.getDebt()==null) {
+                        if ((user.getId() == null) && receivedMessage == null) {
+                            user.setId(usId);
+                            sendingMessage = "full nameni kirit";
+                            System.out.println(user);
+                        } else if (user.getFullName() == null && user.getPhoneNumber() == null && user.getDebt() == null) {
                             user.setFullName(receivedMessage);
                             sendingMessage = "phone number kiriting:";
                             receivedMessage = null;
                         } else if (user.getPhoneNumber() == null && user.getDebt() == null) {
                             user.setPhoneNumber(receivedMessage);
                             sendingMessage = "qarzini kiriting";
-                        }else if (user.getDebt()==null){
+                        } else if (user.getDebt() == null) {
+                            assert receivedMessage != null;
                             user.setDebt(Double.parseDouble(receivedMessage));
                             user.setDate(new Date(Calendar.getInstance().getTimeInMillis()));
                             String query = "Update meat set meat.fullName= ? , date=?, meat.phoneNumber=?, debt=? where  id=" + user.getId() + " ;";
@@ -195,23 +184,21 @@ public class MainController extends TelegramLongPollingBot {
                                 PreparedStatement preparedStatement1 = getConnection().prepareStatement(query);
                                 preparedStatement1.setString(1, user.getFullName());
                                 preparedStatement1.setDate(2, user.getDate());
-                                preparedStatement1.setString(3,user.getPhoneNumber());
-                                preparedStatement1.setDouble(4,user.getDebt());
+                                preparedStatement1.setString(3, user.getPhoneNumber());
+                                preparedStatement1.setDouble(4, user.getDebt());
                                 System.out.println(user);
                                 preparedStatement1.execute();
                                 sendingMessage = "muvofiqiatli o'zgartirildi ";
                                 user = null;
-                                receivedMessage = null;
                             } catch (SQLException throwables) {
                                 throwables.printStackTrace();
                             }
                         }
-                            break;
+                        break;
                     default:
-                        sendingMessage="Notug'ri malumot";
+                        sendingMessage = "Notug'ri malumot";
                         break;
                 }
-//                step++;
             } else if (message.hasContact()) {
                 Contact contact = update.getMessage().getContact();
                 String phoneNumber = contact.getPhoneNumber();
@@ -227,9 +214,7 @@ public class MainController extends TelegramLongPollingBot {
                     sendMessage.setReplyMarkup(replyKeyboardMarkup);
                 }
             }
-
-
-                sendMessage.setText(sendingMessage);
+            sendMessage.setText(sendingMessage);
             sendMessage.setChatId(chatId.toString());
             try {
                 execute(sendMessage);
